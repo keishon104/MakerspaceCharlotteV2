@@ -202,6 +202,8 @@ This should stay an MVP until shop leads review the data. Once the data model is
 
 ## Member Account IA
 
+Detailed member app IA now lives in [`docs/member-app-ia.md`](docs/member-app-ia.md). Keep this section as a high-level bridge from the public static site to the authenticated member product.
+
 ### Member Login / Create Account
 
 Purpose:
@@ -232,7 +234,7 @@ Potential modules:
 - Upcoming member events
 - Required safety classes or shop authorizations
 - Studio/storage status, if applicable
-- Quick links to forms, policies, Slack/Discord/Facebook, Eventbrite, donation page, and contact
+- Quick links to forms, policies, Discord, Eventbrite, donation page, and contact
 
 ### Benefits & Discounts
 
@@ -477,26 +479,21 @@ Do not add search immediately unless the content grows enough to justify it. If 
 ### Suggested Repository Shape
 
 ```text
-src/
-  components/
-  content/
-    announcements/
-    classes/
-    faqs/
-    shops/
-    support/
-  layouts/
-  pages/
-    index.astro
-    visit.astro
-    membership.astro
-    shops/
-    classes.astro
-    support.astro
-    about.astro
-public/
-  images/
-  files/
+apps/
+  www/
+    src/
+      components/
+      content/
+      layouts/
+      pages/
+    public/
+  members/
+    src/
+      app/
+      components/
+      lib/
+docs/
+supabase/
 ```
 
 ### Launch Stack

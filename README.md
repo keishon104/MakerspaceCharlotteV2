@@ -1,27 +1,45 @@
-# MakerSpace Charlotte
+# MakerSpace Charlotte V2
 
-Astro prototype for the public MakerSpace Charlotte website.
+Monorepo prototype for the public MakerSpace Charlotte website and member portal MVP.
 
 ## Stack
 
-- Astro 6
+- Public website: Astro 6
+- Member app: Next.js 16
 - TypeScript
 - Tailwind CSS 4
 - Astro content collections
 - Markdown/YAML-style frontmatter content
+- Supabase-ready auth/data layer for the member app
 
 ## Commands
 
 ```bash
 npm install
-npm run dev
+npm run dev:www
+npm run dev:members
 npm run check
 npm run build
 ```
 
+Local URLs:
+
+- Public site: `http://127.0.0.1:4321`
+- Member app: `http://localhost:4322`
+
+## Apps
+
+```text
+apps/
+  www/       # Astro public static site
+  members/   # Next.js authenticated member portal MVP
+docs/
+supabase/
+```
+
 ## How This Maps From Next.js
 
-- `src/pages` works like file-based routing.
+- `apps/www/src/pages` works like Astro file-based routing.
 - `.astro` files are server-rendered/static by default.
 - Components render to HTML unless you intentionally add client-side JavaScript.
 - Content collections give typed access to Markdown/MDX content.
@@ -31,9 +49,22 @@ npm run build
 
 Starter content lives in:
 
-- `src/content/shops`
-- `src/content/classes`
-- `src/content/faqs`
-- `src/content/support`
+- `apps/www/src/content/shops`
+- `apps/www/src/content/classes`
+- `apps/www/src/content/faqs`
+- `apps/www/src/content/support`
 
-These collections are defined in `src/content.config.ts`.
+These collections are defined in `apps/www/src/content.config.ts`.
+
+## Member App
+
+The member app runs in demo mode until Supabase environment variables are configured.
+
+- `apps/members/.env.example` lists required env vars.
+- `supabase/member-app-schema.sql` contains the first database schema sketch.
+- `apps/members/README.md` covers app-specific setup notes.
+
+## Planning Docs
+
+- `makerspace-charlotte-ia.md` covers the public static website IA.
+- `docs/member-app-ia.md` covers the authenticated member app IA.
