@@ -1,0 +1,42 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const faqs = (await getCollection("faqs")).sort((a, b) => a.data.order - b.data.order);
+const categories = [...new Set(faqs.map((faq) => faq.data.category))];
+---
+
+<BaseLayout title="FAQ | MakerSpace Charlotte">
+  <section class="page-hero">
+    <div class="section-inner">
+      <p class="eyebrow">FAQ</p>
+      <h1>Practical answers before you visit.</h1>
+      <p>
+        This page replaces the current FAQ/contact duplication with a real question
+        library that can grow over time.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="faq-list">
+        {
+          categories.map((category) => (
+            <section class="data-panel">
+              <h2>{category}</h2>
+              {faqs
+                .filter((faq) => faq.data.category === category)
+                .map((faq) => (
+                  <article class="faq-item">
+                    <h3>{faq.data.question}</h3>
+                    <p>{faq.data.answer}</p>
+                  </article>
+                ))}
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

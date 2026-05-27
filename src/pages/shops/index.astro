@@ -1,0 +1,40 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ShopCard from "../../components/ShopCard.astro";
+
+const shops = (await getCollection("shops")).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+---
+
+<BaseLayout title="Shops & Tools | MakerSpace Charlotte">
+  <section class="page-hero">
+    <div class="section-inner">
+      <p class="eyebrow">Shops & Tools</p>
+      <h1>Find the room, tools, and training your project needs.</h1>
+      <p>
+        Each shop page should explain what the area is good for, which tools are
+        available, and what training is required before independent use.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header">
+        <div>
+          <h2>Shop directory</h2>
+          <p>
+            Starter pages use current public site content and should be refined with shop leads.
+            Prospective members can also search the equipment database by tool or category.
+          </p>
+        </div>
+        <a class="button button-outline" href="/equipment/">Search Equipment</a>
+      </div>
+      <div class="grid">
+        {shops.map((shop) => <ShopCard shop={shop} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

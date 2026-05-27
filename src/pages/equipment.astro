@@ -1,0 +1,266 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const equipment = (await getCollection("equipment")).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+const shopEntries = await getCollection("shops");
+const shopSlugByTitle = Object.fromEntries(
+  shopEntries.map((shop) => [shop.data.title, shop.id]),
+);
+
+const shops = [...new Set(equipment.map((item) => item.data.shop))].sort((a, b) =>
+  a.localeCompare(b),
+);
+const categories = [...new Set(equipment.map((item) => item.data.category))].sort((a, b) =>
+  a.localeCompare(b),
+);
+
+const statusLabels = {
+  available: "Available",
+  limited: "Limited",
+  "training-required": "Training required",
+  "ask-on-tour": "Ask on tour",
+};
+---
+
+<BaseLayout
+  title="Equipment Search | MakerSpace Charlotte"
+  description="Search MakerSpace Charlotte equipment by tool, shop, category, access requirement, and training requirement."
+>
+  <section class="page-hero">
+    <div class="section-inner">
+      <p class="eyebrow">Equipment Search</p>
+      <h1>Check whether the space has the tool you need.</h1>
+      <p>
+        This MVP database helps prospective members search equipment before a tour.
+        Availability and access rules should still be confirmed with shop leads.
+      </p>
+    </div>
+  </section>
+
+  <section class="section equipment-section" data-equipment-search>
+    <div class="section-inner">
+      <div class="equipment-toolbar" aria-label="Equipment filters">
+        <label class="field field-search">
+          <span>Search</span>
+          <input
+            data-equipment-query
+            type="search"
+            placeholder="Try laser, pottery, welder, CNC, sewing..."
+            autocomplete="off"
+          />
+        </label>
+
+        <label class="field">
+          <span>Shop</span>
+          <select data-equipment-shop>
+            <option value="">All shops</option>
+            {shops.map((shop) => <option value={shop}>{shop}</option>)}
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Category</span>
+          <select data-equipment-category>
+            <option value="">All categories</option>
+            {categories.map((category) => <option value={category}>{category}</option>)}
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Status</span>
+          <select data-equipment-status>
+            <option value="">Any status</option>
+            {
+              Object.entries(statusLabels).map(([value, label]) => (
+                <option value={value}>{label}</option>
+              ))
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="equipment-summary-row">
+        <p><strong data-equipment-count>{equipment.length}</strong> tools shown</p>
+        <button class="button button-outline equipment-reset" type="button" data-equipment-reset>
+          Reset Filters
+        </button>
+      </div>
+
+      <div class="equipment-grid">
+        {
+          equipment.map((item) => {
+            const searchable = [
+              item.data.name,
+              item.data.shop,
+              item.data.category,
+              item.data.summary,
+              item.data.manufacturer,
+              item.data.model,
+              item.data.access,
+              item.data.publicNotes,
+              ...item.data.keywords,
+              ...item.data.training,
+              ...item.data.relatedClasses,
+            ]
+              .filter(Boolean)
+              .join(" ")
+              .toLowerCase();
+
+            return (
+              <article
+                class="equipment-card"
+                data-equipment-card
+                data-search={searchable}
+                data-shop={item.data.shop}
+                data-category={item.data.category}
+                data-status={item.data.status}
+              >
+                <div class="equipment-card-header">
+                  <span class={`status-pill status-${item.data.status}`}>
+                    {statusLabels[item.data.status]}
+                  </span>
+                  {item.data.trainingRequired && <span class="status-pill">Training</span>}
+                </div>
+                <h2>{item.data.name}</h2>
+                <p>{item.data.summary}</p>
+
+                <dl class="equipment-meta">
+                  <div>
+                    <dt>Shop</dt>
+                    <dd>{item.data.shop}</dd>
+                  </div>
+                  <div>
+                    <dt>Category</dt>
+                    <dd>{item.data.category}</dd>
+                  </div>
+                  <div>
+                    <dt>Quantity</dt>
+                    <dd>{item.data.quantity}</dd>
+                  </div>
+                  {
+                    item.data.model && (
+                      <div>
+                        <dt>Model</dt>
+                        <dd>
+                          {[item.data.manufacturer, item.data.model].filter(Boolean).join(" ")}
+                        </dd>
+                      </div>
+                    )
+                  }
+                </dl>
+
+                <div class="equipment-access">
+                  <h3>Access</h3>
+                  <p>{item.data.access}</p>
+                </div>
+
+                {
+                  item.data.training.length > 0 && (
+                    <div class="equipment-tags" aria-label={`${item.data.name} training`}>
+                      {item.data.training.map((training) => <span>{training}</span>)}
+                    </div>
+                  )
+                }
+
+                {
+                  shopSlugByTitle[item.data.shop] && (
+                    <p class="equipment-card-footer">
+                      <a class="button button-outline" href={`/shops/${shopSlugByTitle[item.data.shop]}/`}>
+                        View Shop
+                      </a>
+                    </p>
+                  )
+                }
+              </article>
+            );
+          })
+        }
+      </div>
+
+      <div class="empty-state" data-equipment-empty hidden>
+        <h2>No matching equipment yet.</h2>
+        <p>
+          Try a broader search or ask about your project during the Wednesday open house.
+          This MVP database is intentionally starter-sized and should grow with shop lead feedback.
+        </p>
+        <a
+          class="button button-primary"
+          href="https://www.eventbrite.com/e/makerspace-charlotte-open-house-tickets-1128405373849?aff=ebdsoporgprofile"
+        >
+          Book a Tour
+        </a>
+      </div>
+    </div>
+
+    <script>
+      const root = document.querySelector("[data-equipment-search]");
+      const queryInput = root?.querySelector("[data-equipment-query]");
+      const shopSelect = root?.querySelector("[data-equipment-shop]");
+      const categorySelect = root?.querySelector("[data-equipment-category]");
+      const statusSelect = root?.querySelector("[data-equipment-status]");
+      const resetButton = root?.querySelector("[data-equipment-reset]");
+      const count = root?.querySelector("[data-equipment-count]");
+      const empty = root?.querySelector("[data-equipment-empty]");
+      const cards = [...(root?.querySelectorAll("[data-equipment-card]") ?? [])];
+
+      const searchInput = queryInput instanceof HTMLInputElement ? queryInput : null;
+      const shopFilter = shopSelect instanceof HTMLSelectElement ? shopSelect : null;
+      const categoryFilter = categorySelect instanceof HTMLSelectElement ? categorySelect : null;
+      const statusFilter = statusSelect instanceof HTMLSelectElement ? statusSelect : null;
+      const emptyState = empty instanceof HTMLElement ? empty : null;
+      const resultCount = count instanceof HTMLElement ? count : null;
+      const equipmentCards = cards.filter((card) => card instanceof HTMLElement);
+
+      const normalize = (value: string) => value.toLowerCase().trim();
+
+      function updateEquipmentResults() {
+        const query = normalize(searchInput?.value ?? "");
+        const shop = shopFilter?.value ?? "";
+        const category = categoryFilter?.value ?? "";
+        const status = statusFilter?.value ?? "";
+        let visible = 0;
+
+        equipmentCards.forEach((card) => {
+          const matchesQuery = !query || card.dataset.search?.includes(query);
+          const matchesShop = !shop || card.dataset.shop === shop;
+          const matchesCategory = !category || card.dataset.category === category;
+          const matchesStatus = !status || card.dataset.status === status;
+          const isVisible = Boolean(
+            matchesQuery && matchesShop && matchesCategory && matchesStatus,
+          );
+
+          card.hidden = !isVisible;
+          if (isVisible) visible += 1;
+        });
+
+        if (resultCount) resultCount.textContent = String(visible);
+        if (emptyState) emptyState.hidden = visible !== 0;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const initialShop = params.get("shop");
+
+      if (initialShop && shopFilter) {
+        shopFilter.value = initialShop;
+      }
+
+      [searchInput, shopFilter, categoryFilter, statusFilter].forEach((control) => {
+        control?.addEventListener("input", updateEquipmentResults);
+      });
+
+      resetButton?.addEventListener("click", () => {
+        if (searchInput) searchInput.value = "";
+        if (shopFilter) shopFilter.value = "";
+        if (categoryFilter) categoryFilter.value = "";
+        if (statusFilter) statusFilter.value = "";
+        updateEquipmentResults();
+        searchInput?.focus();
+      });
+
+      updateEquipmentResults();
+    </script>
+  </section>
+</BaseLayout>

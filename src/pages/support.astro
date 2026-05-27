@@ -1,0 +1,38 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const options = (await getCollection("support")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="Support | MakerSpace Charlotte">
+  <section class="page-hero">
+    <div class="section-inner">
+      <p class="eyebrow">Support</p>
+      <h1>Help keep the space useful, welcoming, and equipped.</h1>
+      <p>
+        Donations, materials, volunteer help, and sponsorships should have clear paths
+        that do not get tangled with membership.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="grid">
+        {
+          options.map((option) => (
+            <article class="card">
+              <div class="card-body">
+                <span class="tag">{option.data.type}</span>
+                <h2>{option.data.title}</h2>
+                <p>{option.data.summary}</p>
+                <p><a class="button button-outline" href={option.data.ctaUrl}>{option.data.ctaLabel}</a></p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

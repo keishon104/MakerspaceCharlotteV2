@@ -1,0 +1,20 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  shop: CollectionEntry<"shops">;
+}
+
+const { shop } = Astro.props;
+---
+
+<a class="card" href={`/shops/${shop.id}/`} aria-label={`View ${shop.data.title} shop details`}>
+  <div class="card-media">
+    <img src={shop.data.image.src} alt={shop.data.image.alt} loading="lazy" />
+  </div>
+  <div class="card-body">
+    <span class="tag">{shop.data.category}</span>
+    <h3>{shop.data.title}</h3>
+    <p>{shop.data.summary}</p>
+  </div>
+</a>

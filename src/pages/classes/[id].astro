@@ -1,0 +1,93 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const classes = await getCollection("classes");
+  return classes.map((item) => ({
+    params: { id: item.id },
+    props: { item },
+  }));
+}
+
+interface Props {
+  item: CollectionEntry<"classes">;
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+---
+
+<BaseLayout
+  title={`${item.data.title} | MakerSpace Charlotte`}
+  description={item.data.summary}
+>
+  <section class="page-hero">
+    <div class="section-inner detail-hero">
+      <div>
+        <p class="eyebrow">{item.data.category}</p>
+        <h1>{item.data.title}</h1>
+        <p>{item.data.summary}</p>
+        <p>
+          <a class="button button-primary" href={item.data.eventbriteUrl}>
+            View Dates on Eventbrite
+          </a>
+        </p>
+      </div>
+      <div class="detail-image-frame class-detail-media">
+        <img src={item.data.image.src} alt={item.data.image.alt} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner data-grid">
+      <article class="data-panel">
+        <h2>Class Details</h2>
+        <dl class="equipment-meta">
+          <div>
+            <dt>Level</dt>
+            <dd>{item.data.level}</dd>
+          </div>
+          <div>
+            <dt>Schedule</dt>
+            <dd>{item.data.schedule}</dd>
+          </div>
+          <div>
+            <dt>Pricing</dt>
+            <dd>{item.data.pricing}</dd>
+          </div>
+          {
+            item.data.shop && (
+              <div>
+                <dt>Shop</dt>
+                <dd>{item.data.shop}</dd>
+              </div>
+            )
+          }
+        </dl>
+      </article>
+
+      <article class="data-panel">
+        <h2>Registration</h2>
+        <p>
+          Dates and ticketing stay on Eventbrite for now. This page gives visitors a
+          clean class-specific step before they leave the site.
+        </p>
+        <p>
+          <a class="button button-secondary" href={item.data.eventbriteUrl}>
+            View Dates on Eventbrite
+          </a>
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="data-panel">
+        <Content />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

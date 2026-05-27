@@ -1,0 +1,157 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ShopCard from "../components/ShopCard.astro";
+import ClassCard from "../components/ClassCard.astro";
+
+const shops = (await getCollection("shops"))
+  .filter((shop) => shop.data.featured)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+const classes = (await getCollection("classes"))
+  .filter((item) => item.data.featured)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const heroImage =
+  "/images/generated/makerspace-hero.jpg";
+---
+
+<BaseLayout>
+  <section class="hero" style={`--hero-image: url(${heroImage});`}>
+    <div class="hero-content">
+      <p class="eyebrow">Make. Learn. Share.</p>
+      <h1>Build something real in Charlotte's community workshop.</h1>
+      <p>
+        MakerSpace Charlotte gives members access to 47,000 sq ft of shared shops,
+        tools, classes, studios, and creative community at 1003 Louise Ave.
+      </p>
+      <div class="hero-actions">
+        <a
+          class="button button-primary"
+          href="https://www.eventbrite.com/e/makerspace-charlotte-open-house-tickets-1128405373849?aff=ebdsoporgprofile"
+        >
+          Book a Tour
+        </a>
+        <a class="button button-secondary" href="/membership/">View Membership</a>
+        <a class="button button-outline" href="/shops/">Explore Shops</a>
+        <a class="button button-outline" href="/equipment/">Search Equipment</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="fact-strip" aria-label="MakerSpace Charlotte quick facts">
+    <div class="fact">
+      <strong>Wednesday 7pm</strong>
+      <span>Public open house tours</span>
+    </div>
+    <div class="fact">
+      <strong>$50/month</strong>
+      <span>Current public membership price</span>
+    </div>
+    <div class="fact">
+      <strong>24/7 access</strong>
+      <span>For members after onboarding</span>
+    </div>
+    <div class="fact">
+      <strong>1003 Louise Ave</strong>
+      <span>Charlotte, NC 28205</span>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Shops & Tools</p>
+          <h2>Start with the shop that fits your project.</h2>
+          <p>
+            Browse the major areas first, then drill into access requirements,
+            equipment, and related classes. The new equipment search is a starter
+            database for prospective members to check tool fit before visiting.
+          </p>
+        </div>
+        <div class="header-actions">
+          <a class="button button-outline" href="/equipment/">Search Equipment</a>
+          <a class="button button-outline" href="/shops/">View All Shops</a>
+        </div>
+      </div>
+      <div class="grid">
+        {shops.map((shop) => <ShopCard shop={shop} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">First Visit</p>
+          <h2>Visiting should feel simple.</h2>
+          <p>
+            The site should guide first-time visitors from curiosity to a tour
+            without making them decode membership details first.
+          </p>
+        </div>
+      </div>
+      <div class="steps">
+        <article class="step">
+          <h3>Come to open house</h3>
+          <p>Join the Wednesday 7pm tour and see the shops in person.</p>
+        </article>
+        <article class="step">
+          <h3>Ask about your project</h3>
+          <p>Bring ideas, materials, or questions so volunteers can point you to the right shop.</p>
+        </article>
+        <article class="step">
+          <h3>Join or take a class</h3>
+          <p>Apply for membership, book a class, or choose the next step that fits.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner split">
+      <div>
+        <p class="eyebrow">Membership</p>
+        <h2>Member access without mystery.</h2>
+        <p>
+          The membership page should make the value clear: family access, 24/7 use,
+          discounted classes, and the training path for higher-risk tools.
+        </p>
+        <ul class="check-list">
+          <li>Current public price: $50/month</li>
+          <li>24/7 access after onboarding</li>
+          <li>Discounted classes for members</li>
+          <li>Studio and storage details when available</li>
+        </ul>
+        <p><a class="button button-secondary" href="/membership/">See Membership Details</a></p>
+      </div>
+      <div class="split-media">
+        <img
+          src="https://cdn.prod.website-files.com/64062b4928d43ee6320fe42d/6408a08abb26c5f218640099_sawstopSmall.jpg"
+          alt="SawStop table saw inside the MakerSpace Charlotte woodshop"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Classes</p>
+          <h2>Classes are the easiest public entry point.</h2>
+          <p>
+            Keep the public page browsable, then send people to Eventbrite only
+            when they are ready to choose a date.
+          </p>
+        </div>
+        <a class="button button-outline" href="/classes/">View Classes</a>
+      </div>
+      <div class="grid">
+        {classes.map((item) => <ClassCard item={item} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

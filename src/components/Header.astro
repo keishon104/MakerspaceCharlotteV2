@@ -1,0 +1,64 @@
+---
+const navItems = [
+  { href: "/visit/", label: "Visit" },
+  { href: "/membership/", label: "Membership" },
+  { href: "/classes/", label: "Classes" },
+  { href: "/support/", label: "Support" },
+  { href: "/about/", label: "About" },
+];
+
+const exploreItems = [
+  {
+    href: "/shops/",
+    label: "Shops & Tools",
+    description: "Browse shop areas and access requirements",
+  },
+  {
+    href: "/equipment/",
+    label: "Equipment Search",
+    description: "Find tools by shop, category, or keyword",
+  },
+];
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="MakerSpace Charlotte home">
+      <span class="brand-logo-frame">
+        <img
+          src="/images/makerspace-charlotte-logo-white.png"
+          alt="MakerSpace Charlotte. Make. Learn. Share."
+          width="800"
+          height="148"
+        />
+      </span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="/visit/">Visit</a>
+      <a href="/membership/">Membership</a>
+      <details class="nav-disclosure">
+        <summary>Explore</summary>
+        <div class="nav-panel">
+          {exploreItems.map((item) => (
+            <a href={item.href}>
+              <span>{item.label}</span>
+              <small>{item.description}</small>
+            </a>
+          ))}
+        </div>
+      </details>
+      {navItems.slice(2).map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+
+    <div class="header-actions">
+      <a class="button button-outline" href="/members/">Member Login</a>
+      <a
+        class="button button-primary"
+        href="https://www.eventbrite.com/e/makerspace-charlotte-open-house-tickets-1128405373849?aff=ebdsoporgprofile"
+      >
+        Book a Tour
+      </a>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,44 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ClassCard from "../../components/ClassCard.astro";
+
+const classes = (await getCollection("classes")).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+---
+
+<BaseLayout title="Classes | MakerSpace Charlotte">
+  <section class="page-hero">
+    <div class="section-inner">
+      <p class="eyebrow">Classes</p>
+      <h1>Learn a shop, make a project, or unlock a tool path.</h1>
+      <p>
+        Classes should be browseable on the site first, then handed off to Eventbrite
+        when someone is ready to book.
+      </p>
+      <p>
+        <a class="button button-primary" href="https://www.eventbrite.com/o/makerspace-charlotte-29737939547">
+          View Eventbrite Listings
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header">
+        <div>
+          <h2>Starter class catalog</h2>
+          <p>
+            These records model the eventual content collection. Dates and live registration
+            can stay in Eventbrite until there is a reason to sync them.
+          </p>
+        </div>
+      </div>
+      <div class="grid">
+        {classes.map((item) => <ClassCard item={item} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
