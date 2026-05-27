@@ -1,4 +1,6 @@
 ---
+import { memberLoginUrl } from "../lib/urls";
+
 const navItems = [
   { href: "/visit/", label: "Visit" },
   { href: "/membership/", label: "Membership" },
@@ -52,7 +54,7 @@ const exploreItems = [
     </nav>
 
     <div class="header-actions">
-      <a class="button button-outline" href="/members/">Member Login</a>
+      <a class="button button-outline" href={memberLoginUrl}>Member Login</a>
       <a
         class="button button-primary"
         href="https://www.eventbrite.com/e/makerspace-charlotte-open-house-tickets-1128405373849?aff=ebdsoporgprofile"

@@ -64,6 +64,23 @@ The member app runs in demo mode until Supabase environment variables are config
 - `supabase/member-app-schema.sql` contains the first database schema sketch.
 - `apps/members/README.md` covers app-specific setup notes.
 
+## Vercel App Links
+
+Current deployments:
+
+- Public site: `https://mcv2public.vercel.app`
+- Member app: `https://mcv2members.vercel.app`
+
+Recommended environment variables:
+
+- Public site Vercel project: `PUBLIC_MEMBERS_APP_URL=https://mcv2members.vercel.app`
+- Member app Vercel project: `NEXT_PUBLIC_PUBLIC_SITE_URL=https://mcv2public.vercel.app`
+
+Local defaults are already wired:
+
+- Public site links to `http://localhost:4322`
+- Member app links back to `http://127.0.0.1:4321`
+
 ## Planning Docs
 
 - `makerspace-charlotte-ia.md` covers the public static website IA.

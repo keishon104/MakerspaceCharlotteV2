@@ -1,4 +1,6 @@
 ---
+import { memberLoginUrl } from "../lib/urls";
+
 const year = new Date().getFullYear();
 ---
 
@@ -36,7 +38,7 @@ const year = new Date().getFullYear();
         <a href="/support/">Support</a>
         <a href="/faq/">FAQ</a>
         <a href="/contact/">Contact</a>
-        <a href="/members/">Member Login</a>
+        <a href={memberLoginUrl}>Member Login</a>
       </div>
     </section>
 

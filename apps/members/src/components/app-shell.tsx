@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "@/app/login/actions";
 import type { PortalSession } from "@/lib/demo-data";
+import { publicSiteUrl } from "@/lib/urls";
 
 const navItems = [
   ["Dashboard", "/dashboard"],
@@ -55,6 +56,12 @@ export function AppShell({
               Sign out
             </button>
           </form>
+          <Link
+            href={publicSiteUrl}
+            className="mt-3 block text-center text-xs font-semibold text-neutral-400 hover:text-white"
+          >
+            Public website
+          </Link>
         </div>
       </aside>
 

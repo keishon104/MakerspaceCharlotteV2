@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signInWithEmail } from "./actions";
 import { hasSupabaseConfig } from "@/lib/supabase/server";
+import { publicSiteUrl } from "@/lib/urls";
 
 export default async function LoginPage({
   searchParams,
@@ -91,7 +92,7 @@ export default async function LoginPage({
             <Link href="/dashboard" className="font-semibold text-teal-800 hover:text-teal-900">
               Open demo dashboard
             </Link>
-            <Link href="https://www.makerspacecharlotte.org" className="text-neutral-600 hover:text-neutral-950">
+            <Link href={publicSiteUrl} className="text-neutral-600 hover:text-neutral-950">
               Public website
             </Link>
           </div>
