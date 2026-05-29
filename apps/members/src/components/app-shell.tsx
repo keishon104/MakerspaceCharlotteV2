@@ -8,7 +8,6 @@ const navItems = [
   ["Dashboard", "/dashboard"],
   ["Membership", "/membership"],
   ["Training & Access", "/training-access"],
-  ["Classes & Learning", "/classes-learning"],
   ["Community", "/community"],
   ["Resources", "/resources"],
   ["Profile", "/profile"],

@@ -8,7 +8,7 @@ interface Props {
 const { item } = Astro.props;
 ---
 
-<article class="card">
+<article class="card class-card">
   <div class="card-media class-card-media">
     <img src={item.data.image.src} alt={item.data.image.alt} loading="lazy" />
   </div>
@@ -21,7 +21,7 @@ const { item } = Astro.props;
       <li>{item.data.schedule}</li>
       <li>{item.data.pricing}</li>
     </ul>
-    <p>
+    <p class="class-card-actions">
       <a class="button button-outline" href={`/classes/${item.id}/`}>Browse Dates</a>
     </p>
   </div>

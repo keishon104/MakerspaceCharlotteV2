@@ -25,6 +25,7 @@ export async function getPortalSession(): Promise<PortalSession> {
     member: {
       status: "pending",
       type: "Pending account match",
+      renewalDate: "Pending account match",
       renewalLabel: "Admins need to match this login to a membership record.",
       householdAccess:
         "Immediate family access appears after membership status is confirmed.",

@@ -1,3 +1,5 @@
+import { MembershipActionsCard } from "@/components/membership-actions-card";
+import { RoomWaitlistCard } from "@/components/room-waitlist-card";
 import { SectionCard } from "@/components/section-card";
 import { StatusBadge } from "@/components/status-badge";
 import { benefits } from "@/lib/demo-data";
@@ -25,6 +27,10 @@ export default async function MembershipPage() {
               <dd className="mt-1 text-neutral-600">{session.member.type}</dd>
             </div>
             <div>
+              <dt className="font-semibold text-neutral-950">Renews on</dt>
+              <dd className="mt-1 text-neutral-600">{session.member.renewalDate}</dd>
+            </div>
+            <div>
               <dt className="font-semibold text-neutral-950">Renewal source</dt>
               <dd className="mt-1 text-neutral-600">{session.member.renewalLabel}</dd>
             </div>
@@ -45,6 +51,14 @@ export default async function MembershipPage() {
           </ul>
         </SectionCard>
       </div>
+
+      <SectionCard title="Rental Rooms Waitlist" eyebrow="Member businesses">
+        <RoomWaitlistCard />
+      </SectionCard>
+
+      <SectionCard title="Membership Changes" eyebrow="Pause or cancel">
+        <MembershipActionsCard />
+      </SectionCard>
     </div>
   );
 }

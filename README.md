@@ -81,6 +81,8 @@ Local defaults are already wired:
 - Public site links to `http://localhost:4322`
 - Member app links back to `http://127.0.0.1:4321`
 
+The public app also has a Vercel redirect for legacy `/members` URLs, so old links skip the public site and go straight to the member dashboard.
+
 ## Planning Docs
 
 - `makerspace-charlotte-ia.md` covers the public static website IA.

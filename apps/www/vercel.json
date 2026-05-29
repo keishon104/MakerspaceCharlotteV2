@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/members",
+      "destination": "https://mcv2members.vercel.app/dashboard",
+      "statusCode": 307
+    },
+    {
+      "source": "/members/:path*",
+      "destination": "https://mcv2members.vercel.app/dashboard",
+      "statusCode": 307
+    }
+  ]
+}

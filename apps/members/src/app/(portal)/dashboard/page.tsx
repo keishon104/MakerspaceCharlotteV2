@@ -1,7 +1,12 @@
 import Link from "next/link";
+import { OnboardingFlow } from "@/components/onboarding-flow";
 import { SectionCard } from "@/components/section-card";
 import { StatusBadge } from "@/components/status-badge";
-import { dashboardNotices, shopInstructions } from "@/lib/demo-data";
+import {
+  dashboardNotices,
+  onboardingSteps,
+  shopInstructions,
+} from "@/lib/demo-data";
 import { getPortalSession } from "@/lib/auth";
 
 export default async function DashboardPage() {
@@ -24,6 +29,8 @@ export default async function DashboardPage() {
         </div>
         <StatusBadge status={session.member.status} />
       </div>
+
+      <OnboardingFlow steps={onboardingSteps} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <SectionCard title="Membership" eyebrow="Status">
