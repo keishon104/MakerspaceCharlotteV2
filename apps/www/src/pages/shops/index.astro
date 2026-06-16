@@ -6,6 +6,7 @@ import ShopCard from "../../components/ShopCard.astro";
 const shops = (await getCollection("shops")).sort((a, b) =>
   a.data.title.localeCompare(b.data.title),
 );
+const shopCount = shops.length;
 ---
 
 <BaseLayout title="Shops & Tools | MakerSpace Charlotte">
@@ -24,7 +25,7 @@ const shops = (await getCollection("shops")).sort((a, b) =>
     <div class="section-inner">
       <div class="section-header">
         <div>
-          <h2>Shop directory</h2>
+        <h2>{shopCount}-shop directory</h2>
           <p>
             Starter pages use current public site content and should be refined with shop leads.
             Prospective members can also search the equipment database by tool or category.
@@ -32,8 +33,8 @@ const shops = (await getCollection("shops")).sort((a, b) =>
         </div>
         <a class="button button-outline" href="/equipment/">Search Equipment</a>
       </div>
-      <div class="grid">
-        {shops.map((shop) => <ShopCard shop={shop} />)}
+      <div class="shop-grid shop-directory-grid">
+        {shops.map((shop, index) => <ShopCard shop={shop} index={index} />)}
       </div>
     </div>
   </section>

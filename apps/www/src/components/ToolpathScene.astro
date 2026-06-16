@@ -1,0 +1,436 @@
+<div class="maker-scene toolpath-scene" data-maker-scene aria-hidden="true">
+  <canvas data-maker-canvas></canvas>
+</div>
+
+<script>
+  type Point = { x: number; y: number };
+  type Operation = {
+    label: string;
+    points: Point[];
+    duration: number;
+  };
+  type Spark = Point & {
+    age: number;
+    life: number;
+    vx: number;
+    vy: number;
+  };
+
+  const sceneRoot = document.querySelector<HTMLElement>("[data-maker-scene]");
+  const canvas = sceneRoot?.querySelector<HTMLCanvasElement>("[data-maker-canvas]");
+
+  if (sceneRoot && canvas) {
+    const root = sceneRoot;
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      root.dataset.failed = "true";
+    } else {
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      const colors = {
+        mint: "#8ff5cd",
+        mintSoft: "rgba(143, 245, 205, 0.2)",
+        orange: "#ff7354",
+        orangeSoft: "rgba(255, 104, 71, 0.22)",
+        white: "rgba(246, 251, 247, 0.82)",
+        grid: "rgba(194, 222, 210, 0.11)",
+      };
+
+      let width = 1;
+      let height = 1;
+      let pixelRatio = 1;
+      let visible = true;
+      let pointerX = 0;
+      let pointerY = 0;
+      let currentX = 0;
+      let currentY = 0;
+      let lastTime = performance.now();
+      let programTime = 5.55;
+      let animationFrame = 0;
+      const sparks: Spark[] = [];
+
+      const circle = (
+        radius: number,
+        centerX = 0,
+        centerY = 0,
+        steps = 52,
+      ) =>
+        Array.from({ length: steps + 1 }, (_, index) => {
+          const angle = (index / steps) * Math.PI * 2 - Math.PI / 2;
+          return {
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius,
+          };
+        });
+
+      const gear = Array.from({ length: 49 }, (_, index) => {
+        const toothCount = 12;
+        const angle = (index / 48) * Math.PI * 2 - Math.PI / 2;
+        const toothPhase = Math.floor((index / 48) * toothCount * 4) % 4;
+        const radius = toothPhase === 1 || toothPhase === 2 ? 1 : 0.82;
+        return {
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius,
+        };
+      });
+
+      const operations: Operation[] = [
+        { label: "CENTER BORE", points: circle(0.27), duration: 1.15 },
+        ...Array.from({ length: 6 }, (_, index) => {
+          const angle = (index / 6) * Math.PI * 2 - Math.PI / 2;
+          return {
+            label: `BOLT HOLE 0${index + 1}`,
+            points: circle(
+              0.09,
+              Math.cos(angle) * 0.51,
+              Math.sin(angle) * 0.51,
+              26,
+            ),
+            duration: 0.48,
+          };
+        }),
+        { label: "OUTER PROFILE", points: gear, duration: 3.9 },
+      ];
+      const programDuration =
+        operations.reduce((total, operation) => total + operation.duration, 0) +
+        1.2;
+
+      const pointAt = (points: Point[], progress: number) => {
+        if (points.length < 2) return points[0] ?? { x: 0, y: 0 };
+
+        const segmentLengths = points.slice(1).map((point, index) => {
+          const previous = points[index];
+          return Math.hypot(point.x - previous.x, point.y - previous.y);
+        });
+        const totalLength = segmentLengths.reduce(
+          (total, length) => total + length,
+          0,
+        );
+        let remaining = Math.max(0, Math.min(1, progress)) * totalLength;
+
+        for (let index = 0; index < segmentLengths.length; index += 1) {
+          const length = segmentLengths[index];
+          if (remaining <= length) {
+            const start = points[index];
+            const end = points[index + 1];
+            const ratio = length === 0 ? 0 : remaining / length;
+            return {
+              x: start.x + (end.x - start.x) * ratio,
+              y: start.y + (end.y - start.y) * ratio,
+            };
+          }
+          remaining -= length;
+        }
+
+        return points.at(-1) ?? { x: 0, y: 0 };
+      };
+
+      const drawPartialPath = (
+        points: Point[],
+        progress: number,
+        transform: (point: Point) => Point,
+      ) => {
+        if (points.length < 2 || progress <= 0) return;
+
+        const segmentLengths = points.slice(1).map((point, index) => {
+          const previous = points[index];
+          return Math.hypot(point.x - previous.x, point.y - previous.y);
+        });
+        const totalLength = segmentLengths.reduce(
+          (total, length) => total + length,
+          0,
+        );
+        let remaining = Math.min(1, progress) * totalLength;
+        const start = transform(points[0]);
+
+        context.beginPath();
+        context.moveTo(start.x, start.y);
+
+        for (let index = 0; index < segmentLengths.length; index += 1) {
+          const length = segmentLengths[index];
+          const segmentStart = points[index];
+          const segmentEnd = points[index + 1];
+
+          if (remaining >= length) {
+            const end = transform(segmentEnd);
+            context.lineTo(end.x, end.y);
+            remaining -= length;
+            continue;
+          }
+
+          const ratio = length === 0 ? 0 : remaining / length;
+          const end = transform({
+            x: segmentStart.x + (segmentEnd.x - segmentStart.x) * ratio,
+            y: segmentStart.y + (segmentEnd.y - segmentStart.y) * ratio,
+          });
+          context.lineTo(end.x, end.y);
+          break;
+        }
+
+        context.stroke();
+      };
+
+      const resize = () => {
+        width = root.clientWidth;
+        height = root.clientHeight;
+        pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+        canvas.width = Math.round(width * pixelRatio);
+        canvas.height = Math.round(height * pixelRatio);
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      };
+
+      const drawGrid = (center: Point, size: number) => {
+        const extent = size * 1.34;
+        const spacing = Math.max(24, size * 0.18);
+        context.save();
+        context.strokeStyle = colors.grid;
+        context.lineWidth = 1;
+
+        for (
+          let x = center.x - extent;
+          x <= center.x + extent;
+          x += spacing
+        ) {
+          context.beginPath();
+          context.moveTo(x, center.y - extent);
+          context.lineTo(x, center.y + extent);
+          context.stroke();
+        }
+        for (
+          let y = center.y - extent;
+          y <= center.y + extent;
+          y += spacing
+        ) {
+          context.beginPath();
+          context.moveTo(center.x - extent, y);
+          context.lineTo(center.x + extent, y);
+          context.stroke();
+        }
+
+        context.setLineDash([4, 8]);
+        context.strokeStyle = "rgba(246, 251, 247, 0.18)";
+        context.strokeRect(
+          center.x - extent,
+          center.y - extent,
+          extent * 2,
+          extent * 2,
+        );
+        context.restore();
+      };
+
+      const drawCornerMarks = (center: Point, size: number) => {
+        const extent = size * 1.34;
+        const length = 18;
+        context.save();
+        context.strokeStyle = "rgba(143, 245, 205, 0.48)";
+        context.lineWidth = 1.4;
+
+        [
+          { x: center.x - extent, y: center.y - extent, dx: 1, dy: 1 },
+          { x: center.x + extent, y: center.y - extent, dx: -1, dy: 1 },
+          { x: center.x - extent, y: center.y + extent, dx: 1, dy: -1 },
+          { x: center.x + extent, y: center.y + extent, dx: -1, dy: -1 },
+        ].forEach((corner) => {
+          context.beginPath();
+          context.moveTo(corner.x, corner.y + corner.dy * length);
+          context.lineTo(corner.x, corner.y);
+          context.lineTo(corner.x + corner.dx * length, corner.y);
+          context.stroke();
+        });
+        context.restore();
+      };
+
+      const addSparks = (point: Point, amount: number) => {
+        for (let index = 0; index < amount; index += 1) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 18 + Math.random() * 54;
+          sparks.push({
+            x: point.x,
+            y: point.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            age: 0,
+            life: 0.2 + Math.random() * 0.45,
+          });
+        }
+      };
+
+      const drawSparks = (delta: number) => {
+        context.save();
+        context.globalCompositeOperation = "screen";
+        for (let index = sparks.length - 1; index >= 0; index -= 1) {
+          const spark = sparks[index];
+          spark.age += delta;
+          spark.x += spark.vx * delta;
+          spark.y += spark.vy * delta;
+          spark.vy += 38 * delta;
+
+          if (spark.age >= spark.life) {
+            sparks.splice(index, 1);
+            continue;
+          }
+
+          const opacity = 1 - spark.age / spark.life;
+          context.fillStyle = `rgba(255, 122, 78, ${opacity})`;
+          context.fillRect(spark.x, spark.y, 2.2, 2.2);
+        }
+        context.restore();
+      };
+
+      const draw = (time: number) => {
+        const delta = Math.min((time - lastTime) / 1000, 0.05);
+        lastTime = time;
+
+        if (!visible && !reducedMotion) {
+          animationFrame = requestAnimationFrame(draw);
+          return;
+        }
+
+        if (!reducedMotion && visible) {
+          programTime = (programTime + delta) % programDuration;
+          currentX += (pointerX - currentX) * 0.035;
+          currentY += (pointerY - currentY) * 0.035;
+        }
+
+        context.clearRect(0, 0, width, height);
+
+        const isMobile = width < 720;
+        const size = Math.min(
+          height * (isMobile ? 0.23 : 0.31),
+          width * (isMobile ? 0.29 : 0.17),
+        );
+        const center = {
+          x:
+            width * (isMobile ? 0.68 : 0.76) +
+            currentX * (isMobile ? 6 : 16),
+          y:
+            height * (isMobile ? 0.37 : 0.47) +
+            currentY * (isMobile ? 5 : 12),
+        };
+        const transform = (point: Point) => ({
+          x: center.x + point.x * size,
+          y: center.y + point.y * size,
+        });
+
+        drawGrid(center, size);
+        drawCornerMarks(center, size);
+
+        context.save();
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.lineWidth = Math.max(1, size * 0.008);
+        context.strokeStyle = colors.mintSoft;
+        operations.forEach((operation) =>
+          drawPartialPath(operation.points, 1, transform),
+        );
+        context.restore();
+
+        let elapsed = reducedMotion ? programDuration : programTime;
+        let activeIndex = operations.length - 1;
+        let activeProgress = 1;
+
+        for (let index = 0; index < operations.length; index += 1) {
+          const operation = operations[index];
+          if (elapsed <= operation.duration) {
+            activeIndex = index;
+            activeProgress = elapsed / operation.duration;
+            break;
+          }
+          elapsed -= operation.duration;
+        }
+
+        context.save();
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.lineWidth = Math.max(1.8, size * 0.014);
+        context.shadowBlur = 10;
+        context.shadowColor = "rgba(143, 245, 205, 0.55)";
+        context.strokeStyle = colors.mint;
+
+        operations.forEach((operation, index) => {
+          const progress =
+            index < activeIndex ? 1 : index === activeIndex ? activeProgress : 0;
+          drawPartialPath(operation.points, progress, transform);
+        });
+        context.restore();
+
+        const activeOperation = operations[activeIndex];
+        const localHead = pointAt(activeOperation.points, activeProgress);
+        const head = transform(localHead);
+
+        if (!reducedMotion && visible && activeProgress < 0.995) {
+          if (Math.random() > 0.48) addSparks(head, 1);
+        }
+        drawSparks(delta);
+
+        context.save();
+        context.globalCompositeOperation = "screen";
+        context.strokeStyle = colors.orangeSoft;
+        context.lineWidth = 8;
+        context.beginPath();
+        context.arc(head.x, head.y, 11, 0, Math.PI * 2);
+        context.stroke();
+        context.fillStyle = colors.orange;
+        context.shadowBlur = 18;
+        context.shadowColor = colors.orange;
+        context.beginPath();
+        context.arc(head.x, head.y, 4.2, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+
+        const labelX = center.x - size * 1.34;
+        const labelY = center.y - size * 1.52;
+        context.save();
+        context.font = "600 11px Arial, sans-serif";
+        context.letterSpacing = "0px";
+        context.fillStyle = colors.orange;
+        context.shadowBlur = 5;
+        context.shadowColor = "rgba(0, 0, 0, 0.9)";
+        context.fillText("CNC ROUTER / ACTIVE PROGRAM", labelX, labelY);
+        context.font = "700 14px Arial, sans-serif";
+        context.fillStyle = colors.white;
+        context.fillText(activeOperation.label, labelX, labelY + 23);
+        context.font = "500 10px Arial, sans-serif";
+        context.fillStyle = "rgba(246, 251, 247, 0.58)";
+        context.fillText(
+          `PASS ${String(activeIndex + 1).padStart(2, "0")} / ${String(operations.length).padStart(2, "0")}   FEED 1800`,
+          labelX,
+          labelY + 42,
+        );
+        context.restore();
+
+        root.dataset.ready = "true";
+        if (!reducedMotion) animationFrame = requestAnimationFrame(draw);
+      };
+
+      const observer = new IntersectionObserver(([entry]) => {
+        visible = entry?.isIntersecting ?? true;
+      });
+      observer.observe(root);
+
+      const resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(root);
+
+      window.addEventListener(
+        "pointermove",
+        (event) => {
+          const bounds = root.getBoundingClientRect();
+          pointerX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
+          pointerY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
+        },
+        { passive: true },
+      );
+
+      resize();
+      draw(performance.now());
+
+      window.addEventListener("pagehide", () => {
+        cancelAnimationFrame(animationFrame);
+        observer.disconnect();
+        resizeObserver.disconnect();
+      });
+    }
+  }
+</script>

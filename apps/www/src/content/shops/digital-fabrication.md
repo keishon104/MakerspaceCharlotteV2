@@ -1,7 +1,7 @@
 ---
 title: "Digital Fabrication"
 category: "Digital"
-summary: "3D printing, laser cutting, engraving, CNC workflows, and electronics-friendly project support."
+summary: "3D printing, laser cutting, engraving, and CNC workflows for turning digital designs into physical objects."
 image:
   src: "/images/generated/digital-fabrication-lab.jpg"
   alt: "A digital fabrication lab with 3D printers, filament, workbenches, and organized storage"
@@ -12,7 +12,6 @@ equipment:
   - "Creality CR-30 belt printer"
   - "Laser cutter and engraver"
   - "CNC machines"
-  - "Electronics tools"
 access: "Some tools require authorization or a safety class before independent use."
 training:
   - "Intro to Laser"

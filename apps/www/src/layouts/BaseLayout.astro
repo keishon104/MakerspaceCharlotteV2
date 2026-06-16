@@ -1,16 +1,20 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import MotionSystem from "../components/MotionSystem.astro";
 import "../styles/global.css";
+import "../styles/redesign.css";
 
 interface Props {
   title?: string;
   description?: string;
+  immersive?: boolean;
 }
 
 const {
   title = "MakerSpace Charlotte",
   description = "Make, learn, and build in Charlotte's community workshop.",
+  immersive = false,
 } = Astro.props;
 ---
 
@@ -20,6 +24,7 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0b0d0c" />
     <link rel="shortcut icon" href="/favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{title}</title>
@@ -31,5 +36,6 @@ const {
       <slot />
     </main>
     <Footer />
+    {immersive && <MotionSystem />}
   </body>
 </html>

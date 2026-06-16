@@ -6,7 +6,9 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <section>
+    <section class="footer-intro">
+      <p class="eyebrow">Make. Learn. Share.</p>
+      <h2>Ideas need somewhere to get loud.</h2>
       <img
         class="footer-logo"
         src="/images/makerspace-charlotte-logo-white.png"
@@ -16,12 +18,18 @@ const year = new Date().getFullYear();
         loading="lazy"
       />
       <p>
-        Open 24/7 for members at 1003 Louise Ave, Charlotte, NC 28205.
-        Public open house tours run Wednesdays at 7pm.
+        Charlotte's nonprofit community workshop. Open 24/7 for members at
+        1003 Louise Ave.
       </p>
+      <a
+        class="button button-primary"
+        href="https://www.eventbrite.com/e/makerspace-charlotte-open-house-tickets-1128405373849?aff=ebdsoporgprofile"
+      >
+        Visit Wednesday at 7pm
+      </a>
     </section>
 
-    <section>
+    <section class="footer-nav">
       <h3>Explore</h3>
       <div class="footer-links">
         <a href="/visit/">Visit</a>
@@ -32,7 +40,7 @@ const year = new Date().getFullYear();
       </div>
     </section>
 
-    <section>
+    <section class="footer-nav">
       <h3>Connect</h3>
       <div class="footer-links">
         <a href="/support/">Support</a>
@@ -42,6 +50,9 @@ const year = new Date().getFullYear();
       </div>
     </section>
 
-    <p class="footer-meta">© {year} MakerSpace Charlotte. Prototype static site.</p>
+    <div class="footer-meta">
+      <p>© {year} MakerSpace Charlotte</p>
+      <p>Make something that did not exist yesterday.</p>
+    </div>
   </div>
 </footer>
