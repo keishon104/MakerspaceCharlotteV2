@@ -3,18 +3,30 @@ import type { CollectionEntry } from "astro:content";
 
 interface Props {
   shop: CollectionEntry<"shops">;
+  index?: number;
 }
 
-const { shop } = Astro.props;
+const { shop, index = 0 } = Astro.props;
+const hasLongTitle = shop.data.title.length > 24;
 ---
 
-<a class="card" href={`/shops/${shop.id}/`} aria-label={`View ${shop.data.title} shop details`}>
-  <div class="card-media">
+<a
+  class:list={["shop-card", { "shop-card-long-title": hasLongTitle }]}
+  href={`/shops/${shop.id}/`}
+  aria-label={`View ${shop.data.title} shop details`}
+  data-reveal
+>
+  <div class="shop-card-media" data-image-parallax>
     <img src={shop.data.image.src} alt={shop.data.image.alt} loading="lazy" />
   </div>
-  <div class="card-body">
-    <span class="tag">{shop.data.category}</span>
+  <div class="shop-card-shade"></div>
+  <div class="shop-card-topline">
+    <span>{String(index + 1).padStart(2, "0")}</span>
+    <span>{shop.data.category}</span>
+  </div>
+  <div class="shop-card-body">
     <h3>{shop.data.title}</h3>
     <p>{shop.data.summary}</p>
+    <span class="text-link">Explore shop</span>
   </div>
 </a>
